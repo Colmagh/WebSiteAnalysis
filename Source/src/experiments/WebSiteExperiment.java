@@ -11,7 +11,8 @@ import ca.uqac.lif.labpal.Experiment;
 import ca.uqac.lif.labpal.ExperimentException;
 
 public class WebSiteExperiment extends Experiment {
-	private static List<String>WhiteList = Arrays.asList(
+	
+	private static final List<String>WhiteList = Arrays.asList(
 			"visibility",
 			"display",
 			"widthOrHeight",
@@ -25,7 +26,7 @@ public class WebSiteExperiment extends Experiment {
 			"nbNoeudsInvisibles",
 			"Pas de classe");
 	
-	private static List<String> SVGList = Arrays.asList(
+	private static final List<String> SVGList = Arrays.asList(
 			"a",
 			"animate",
 			"animateMotion",
@@ -99,7 +100,7 @@ public class WebSiteExperiment extends Experiment {
 			"unknown",
 			"use",
 			"view");
-	
+		
 	public WebSiteExperiment(String filePath, int expID)
 	{
 		setInput("FilePath", filePath);
