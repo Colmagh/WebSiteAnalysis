@@ -341,7 +341,7 @@ public class MyLaboratory extends Laboratory
 		add(nbElementsVSnbClasses);
 		
 		//Add each web site as an experiment
-		File f = new File("C:\\Users\\xavierchamberland\\Documents\\Autre\\Uqac\\Maitrise\\Data\\liste_fichiers_statistiques.txt");
+		File f = new File("statistics_files_list.txt");
 		
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(f));
