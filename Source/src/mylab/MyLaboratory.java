@@ -326,7 +326,7 @@ public class MyLaboratory extends Laboratory
 												"WBR", 
 												"GCSE:SEARCHBOX-ONLY");
 
-	//Créer les constantes pour les strings
+	//CrÃ©er les constantes pour les strings
 	
 	@Override
 	public void setup()

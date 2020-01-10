@@ -33,7 +33,7 @@
   <author>Emmett Brown</author>
   
   <!-- The project's main class -->
-  <mainclass>MyLaboratory</mainclass>
+  <mainclass>mylab.MyLaboratory</mainclass>
   
   <!-- Output jar -->
   <jar>
