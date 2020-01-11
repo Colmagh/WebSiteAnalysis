@@ -1,17 +1,13 @@
-package mylab;
+package liflab.wsprofilinglab;
 
 import java.io.*;
 import java.util.Arrays;
 import java.util.List;
-import Tables.HistogramTable;
-import Tables.PercentUsageHistogramTable;
-import Tables.PercentageHistogramTable;
-import Tables.PieChartTable;
+
 import ca.uqac.lif.labpal.Laboratory;
 import ca.uqac.lif.labpal.table.ExperimentTable;
 import ca.uqac.lif.mtnp.plot.TwoDimensionalPlot.Axis;
 import ca.uqac.lif.mtnp.plot.gnuplot.*;
-import experiments.WebSiteExperiment;
 
 public class MyLaboratory extends Laboratory
 {
@@ -331,7 +327,7 @@ public class MyLaboratory extends Laboratory
 	@Override
 	public void setup()
 	{
-		setTitle("Composition of a website");
+		setTitle("Structural profiling of websites in the wild");
 		setAuthor("Xavier Chamberland-Thibeault");
 		
 		// Create tables		

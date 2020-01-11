@@ -1,4 +1,4 @@
-package experiments;
+package liflab.wsprofilinglab;
 
 import java.io.File;
 import java.io.FileReader;
