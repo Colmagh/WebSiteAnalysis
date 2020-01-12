@@ -14,7 +14,7 @@ public class PercentageHistogramTable extends HardTable {
 	
 	private Laboratory lab;
 	private String paramNumerator, paramDenominator;
-	private int[] gaps = {10,20,30,40,50,60,70,80,90,100};
+	private double[] gaps = {0.10,0.20,0.30,0.40,0.50,0.60,0.70,0.80,0.90,1};
 	
 	public PercentageHistogramTable (Laboratory lab, String paramNumerator, String paramDenominator)
 	{
@@ -41,7 +41,7 @@ public class PercentageHistogramTable extends HardTable {
 		for(int i = 0; i < gaps.length; i++)
 		{
 			TableEntry te = new TableEntry();
-			te.put(paramNumerator, String.valueOf(gaps[i]));
+			te.put(paramNumerator, String.valueOf(gaps[i]*100));
 			te.put("nbSites", siteValues.get(String.valueOf(gaps[i])));
 			entries.add(te);
 		}
@@ -58,7 +58,7 @@ public class PercentageHistogramTable extends HardTable {
 		{
 			for(int i = 0; i < gaps.length; i++)
 			{
-				if((e.readInt(paramNumerator)/e.readInt(paramDenominator))*100 <= gaps[i])
+				if((e.readInt(paramNumerator)/(double)e.readInt(paramDenominator)) <= gaps[i])
 				{
 					int temp = values.get(String.valueOf(gaps[i])) != null? (int) values.get(String.valueOf(gaps[i])):0;
 					temp++;
