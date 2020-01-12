@@ -2,8 +2,8 @@ package liflab.wsprofilinglab;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 
+import ca.uqac.lif.labpal.FileHelper;
 import ca.uqac.lif.labpal.Laboratory;
 import ca.uqac.lif.labpal.table.ExperimentTable;
 import ca.uqac.lif.mtnp.plot.TwoDimensionalPlot.Axis;
@@ -337,17 +337,15 @@ public class MyLaboratory extends Laboratory
 		add(nbElementsVSnbClasses);
 
 		//Add each web site as an experiment
-		Scanner scanner = new Scanner(MyLaboratory.class.getResourceAsStream("data/statistics_files_list.txt"));
+		List<String> filenames = FileHelper.getResourceListing(MyLaboratory.class, "liflab/wsprofilinglab/data", ".*\\.json");
 		int cpt = 1;
-		while(scanner.hasNextLine())
+		for (String file : filenames)
 		{
-			String file = scanner.nextLine();
 			WebSiteExperiment exp = new WebSiteExperiment(file, cpt);
 			add(exp, new ExperimentTable[0]);
 			nbElementsVSnbClasses.add(exp);
 			cpt++;
 		}
-		scanner.close();
 
 		HistogramTable nbElement = new HistogramTable(this,"nbElementTotal",new int[] {100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600,1700,1800,1900,2000,2100,2200,2300,2400,2500,2600,2700,2800,2900,3000,10000});
 		nbElement.setTitle("Distribution of websites relative to their number of elements");
@@ -399,7 +397,7 @@ public class MyLaboratory extends Laboratory
 		percentInvisibleElements.setNickname("percentInvisible");
 		add(percentInvisibleElements);
 
-		PieChartTable invisibleTypeUsage = new PieChartTable(this, "InvisibleType", new String[] {"visibility", "display", "widthOrHeight", "negativePosition", "outsidePosition"});
+		PieChartTable invisibleTypeUsage = new PieChartTable(this, "InvisibleType", new String[] {"visibility", "Display", "widthOrHeight", "negativePosition", "outsidePosition"});
 		invisibleTypeUsage.setTitle("Distribution of invisible type usage in websites");
 		invisibleTypeUsage.setNickname("invisibleType");
 		add(invisibleTypeUsage);
@@ -407,40 +405,40 @@ public class MyLaboratory extends Laboratory
 
 		//Create plots	
 		ClusteredHistogram histogramNbElement = new ClusteredHistogram(nbElement);
-		histogramNbElement.setTitle("Graphical representation of the distribution of websites relative to their number of elements");
+		histogramNbElement.setTitle("Distribution of websites relative to their number of elements");
 		histogramNbElement.setNickname("nbElementPlot");
 		histogramNbElement.setCaption(Axis.X, "Number of elements");
 		histogramNbElement.setCaption(Axis.Y, "Number of sites");		
 		add(histogramNbElement);
 
 		ClusteredHistogram histogramMaxDegree = new ClusteredHistogram(distributionDegreeMax);
-		histogramMaxDegree.setTitle("Graphical representation of the distribution of websites relative to the maximum degree of the DOM tree");
+		histogramMaxDegree.setTitle("Distribution of websites relative to the maximum degree of the DOM tree");
 		histogramMaxDegree.setNickname("MaxDegreePlot");
 		histogramMaxDegree.setCaption(Axis.X, "Greatest degree of the DOM tree");
 		histogramMaxDegree.setCaption(Axis.Y, "Number of sites");		
 		add(histogramMaxDegree);
 
 		ClusteredHistogram histogramMaxDepth = new ClusteredHistogram(distributionDepthMax);
-		histogramMaxDepth.setTitle("Graphical representation of the distribution of websites relative to the maximum depth of the DOM tree");
+		histogramMaxDepth.setTitle("Distribution of websites relative to the maximum depth of the DOM tree");
 		histogramMaxDepth.setNickname("MaxDepthPlot");
 		histogramMaxDepth.setCaption(Axis.X, "Greatest depth of the DOM tree");
 		histogramMaxDepth.setCaption(Axis.Y, "Number of sites");	
 		add(histogramMaxDepth);
 
 		ca.uqac.lif.mtnp.plot.gral.PieChart elementTagUsagePlot = new ca.uqac.lif.mtnp.plot.gral.PieChart(elementTagUsage);
-		elementTagUsagePlot.setTitle("Graphical representation of the distribution of element tag type usage in websites");
+		elementTagUsagePlot.setTitle("Distribution of element tag type usage in websites");
 		elementTagUsagePlot.setNickname("elementTagUsage");
 		add(elementTagUsagePlot);
 
 		ClusteredHistogram histogramPercentFrequency = new ClusteredHistogram(frequencyOfTag);
-		histogramPercentFrequency.setTitle("Graphical representation of the distribution of tag frequency in websites");
+		histogramPercentFrequency.setTitle("Distribution of tag frequency in websites");
 		histogramPercentFrequency.setNickname("percTagPlot");
 		histogramPercentFrequency.setCaption(Axis.X, "Tag");
 		histogramPercentFrequency.setCaption(Axis.Y, "Percentage of site using the tag");
 		add(histogramPercentFrequency);	
 
 		Scatterplot classesVSsiteSize = new Scatterplot(nbElementsVSnbClasses);
-		classesVSsiteSize.setTitle("Graphical representation of the distribution of the number of elements relative to the number of classes");
+		classesVSsiteSize.setTitle("Distribution of the number of elements relative to the number of classes");
 		classesVSsiteSize.setNickname("classToNbElements");
 		classesVSsiteSize.withLines(false);
 		classesVSsiteSize.setCaption(Axis.X, "Number of elements");
@@ -448,42 +446,42 @@ public class MyLaboratory extends Laboratory
 		add(classesVSsiteSize);
 
 		ClusteredHistogram histogramNbClasses = new ClusteredHistogram(distributionNbClasses);
-		histogramNbClasses.setTitle("Graphical representation of the distribution of websites relative to the number of classes");
+		histogramNbClasses.setTitle("Distribution of websites relative to the number of classes");
 		histogramNbClasses.setNickname("nbClassesPlot");
 		histogramNbClasses.setCaption(Axis.X, "Number of classes");
 		histogramNbClasses.setCaption(Axis.Y, "Number of sites");
 		add(histogramNbClasses);
 
 		ClusteredHistogram histogramMaxClasses = new ClusteredHistogram(distributionMaxClasses);
-		histogramMaxClasses.setTitle("Graphical representation of the distribution of websites relative to the size of the biggest class");
+		histogramMaxClasses.setTitle("Distribution of websites relative to the size of the biggest class");
 		histogramMaxClasses.setNickname("MaxDClassesPlot");
 		histogramMaxClasses.setCaption(Axis.X, "Size of the biggest classes");
 		histogramMaxClasses.setCaption(Axis.Y, "Number of sites");
 		add(histogramMaxClasses);
 
 		ClusteredHistogram histogramAvgClasses = new ClusteredHistogram(distributionAvgClasses);
-		histogramAvgClasses.setTitle("Graphical representation of the distribution of websites relative to the average size of the classes");
+		histogramAvgClasses.setTitle("Distribution of websites relative to the average size of the classes");
 		histogramAvgClasses.setNickname("avgClassesPlot");
 		histogramAvgClasses.setCaption(Axis.X, "Average size of the classes");
 		histogramAvgClasses.setCaption(Axis.Y, "Number of sites");
 		add(histogramAvgClasses);
 
 		ClusteredHistogram histogramNoClass = new ClusteredHistogram(distributionNoClasses);
-		histogramNoClass.setTitle("Graphical representation of the distribution of websites relative to the number of nodes without a class");
+		histogramNoClass.setTitle("Distribution of websites relative to the number of nodes without a class");
 		histogramNoClass.setNickname("noClassPlot");
 		histogramNoClass.setCaption(Axis.X, "Number of nodes without a class");
 		histogramNoClass.setCaption(Axis.Y, "Number of sites");
 		add(histogramNoClass);
 
 		ClusteredHistogram histogramPercentInvisible = new ClusteredHistogram(percentInvisibleElements);
-		histogramPercentInvisible.setTitle("Graphical representation of the distribution of websites relative to the percentage of invisible nodes");
+		histogramPercentInvisible.setTitle("Distribution of websites relative to the percentage of invisible nodes");
 		histogramPercentInvisible.setNickname("percInvisiblePlot");
 		histogramPercentInvisible.setCaption(Axis.X, "Percentage of invisible nodes");
 		histogramPercentInvisible.setCaption(Axis.Y, "Number of sites");
 		add(histogramPercentInvisible);
 
 		ca.uqac.lif.mtnp.plot.gral.PieChart invisibleTypeUsagePlot = new ca.uqac.lif.mtnp.plot.gral.PieChart(invisibleTypeUsage);
-		invisibleTypeUsagePlot.setTitle("Graphical representation of the distribution of invisible type usage in websites");
+		invisibleTypeUsagePlot.setTitle("Distribution of invisible type usage in websites");
 		invisibleTypeUsagePlot.setNickname("invisibleTypeUsage");
 		add(invisibleTypeUsagePlot);		
 	}

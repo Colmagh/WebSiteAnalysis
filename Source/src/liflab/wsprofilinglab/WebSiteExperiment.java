@@ -1,17 +1,19 @@
 package liflab.wsprofilinglab;
 
-import java.io.File;
-import java.io.FileReader;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 import ca.uqac.lif.labpal.Experiment;
 import ca.uqac.lif.labpal.ExperimentException;
+import ca.uqac.lif.mtnp.util.FileHelper;
 
 public class WebSiteExperiment extends Experiment {
-	
+
 	private static final List<String>WhiteList = Arrays.asList(
 			"visibility",
 			"display",
@@ -25,7 +27,7 @@ public class WebSiteExperiment extends Experiment {
 			"degreMaxArbre",
 			"nbNoeudsInvisibles",
 			"Pas de classe");
-	
+
 	private static final List<String> SVGList = Arrays.asList(
 			"a",
 			"animate",
@@ -100,7 +102,7 @@ public class WebSiteExperiment extends Experiment {
 			"unknown",
 			"use",
 			"view");
-		
+
 	public WebSiteExperiment(String filePath, int expID)
 	{
 		setInput("FilePath", filePath);
@@ -113,83 +115,77 @@ public class WebSiteExperiment extends Experiment {
 	public WebSiteExperiment()
 	{
 	}
-	
+
 	@Override
 	public void execute() throws ExperimentException, InterruptedException {
 		String filePath = readString("FilePath");
-		String siteName = filePath.substring(filePath.lastIndexOf("\\") + 1, filePath.lastIndexOf("."));
-		
-		File f = new File(filePath);
-		
+		String siteName = filePath;//filePath.substring(filePath.lastIndexOf("\\") + 1, filePath.lastIndexOf("."));
 		write("siteName", siteName);
-		
-		try {
-			FileReader reader =new FileReader(f);
-			JSONParser parser = new JSONParser();
-			
-			JSONObject data = (JSONObject) parser.parse(reader);
-			
-		
-			@SuppressWarnings("unchecked")
-			Iterator<String> keys = (Iterator<String>) data.keySet().iterator();
-			int maxParClasse = 0;
-			int minParClasse = Integer.MAX_VALUE;
-			int moyenneParClasse = 0;
-			int nbClasse = 0;
-			
-			while(keys.hasNext())
+		String contents = FileHelper.readToString(WebSiteExperiment.class.getResourceAsStream("data/" + filePath));
+		JSONParser parser = new JSONParser();
+
+		JSONObject data;
+		try 
+		{
+			data = (JSONObject) parser.parse(contents);
+		}
+		catch (ParseException e)
+		{
+			throw new ExperimentException(e);
+		}
+		@SuppressWarnings("unchecked")
+		Iterator<String> keys = (Iterator<String>) data.keySet().iterator();
+		int maxParClasse = 0;
+		int minParClasse = Integer.MAX_VALUE;
+		int moyenneParClasse = 0;
+		int nbClasse = 0;
+
+		while(keys.hasNext())
+		{
+			Object key = keys.next();
+			String keyName = key.toString();
+			int keyValue = Integer.parseInt(data.get(key).toString());
+
+			if(containsLowerCase(keyName) && !WhiteList.contains(keyName) && !SVGList.contains(keyName))
 			{
-				Object key = keys.next();
-				String keyName = key.toString();
-				int keyValue = Integer.parseInt(data.get(key).toString());
-				
-				if(containsLowerCase(keyName) && !WhiteList.contains(keyName) && !SVGList.contains(keyName))
+				nbClasse++;
+				moyenneParClasse += keyValue;
+
+				if (minParClasse > keyValue)
 				{
-					nbClasse++;
-					moyenneParClasse += keyValue;
-					
-					if (minParClasse > keyValue)
-					{
-						minParClasse = keyValue;
-					}
-					
-					if (maxParClasse < keyValue)
-					{
-						maxParClasse = keyValue;
-					}
+					minParClasse = keyValue;
 				}
-				else
+
+				if (maxParClasse < keyValue)
 				{
-					write(keyName,keyValue);
+					maxParClasse = keyValue;
 				}
 			}
-
-			write("nbClasse", nbClasse);
-			write("minParClasse", minParClasse);
-			write("maxParClasse", maxParClasse);			
-			write("moyenneParClasse", nbClasse > 0 ?moyenneParClasse/nbClasse : 0);
-			
-			reader.close();
+			else
+			{
+				write(keyName,keyValue);
+			}
 		}
-		catch(Exception e)
-		{
-			System.out.println(filePath + " " +e.getMessage());
-		}		
+
+		write("nbClasse", nbClasse);
+		write("minParClasse", minParClasse);
+		write("maxParClasse", maxParClasse);			
+		write("moyenneParClasse", nbClasse > 0 ?moyenneParClasse/nbClasse : 0);
 	}
-	
+
 	private boolean containsLowerCase(String str)
 	{
 		//convert String to char array
-        char[] charArray = str.toCharArray();
-        
-        for(int i=0; i < charArray.length; i++){
-            
-            //if any character is not in lower case, return false
-            if( Character.isLowerCase( charArray[i] ))
-                return true;
-        }
-        
-        return false;
+		char[] charArray = str.toCharArray();
+
+		for(int i=0; i < charArray.length; i++){
+
+			//if any character is not in lower case, return false
+			if( Character.isLowerCase( charArray[i] ))
+				return true;
+		}
+
+		return false;
 	}
-	
+
 }
