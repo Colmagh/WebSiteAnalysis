@@ -1,4 +1,4 @@
-package Tables;
+package liflab.wsprofilinglab;
 
 import java.util.ArrayList;
 import java.util.Collection;
