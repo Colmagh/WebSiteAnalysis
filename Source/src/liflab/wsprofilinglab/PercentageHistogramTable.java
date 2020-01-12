@@ -58,7 +58,13 @@ public class PercentageHistogramTable extends HardTable {
 		{
 			for(int i = 0; i < gaps.length; i++)
 			{
-				if((e.readInt(paramNumerator)/e.readInt(paramDenominator))*100 <= gaps[i])
+				int denom = e.readInt(paramDenominator);
+				if (denom == 0)
+				{
+					values.put(String.valueOf(gaps[i]), 0);
+					continue;
+				}
+				else if((e.readInt(paramNumerator)/denom)*100 <= gaps[i])
 				{
 					int temp = values.get(String.valueOf(gaps[i])) != null? (int) values.get(String.valueOf(gaps[i])):0;
 					temp++;
