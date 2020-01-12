@@ -63,4 +63,4 @@ jacoco.exec
 *.ini
 
 # Data files (not yet)
-Source/src/liflab/wsprofilinglab/data/*.json
+Source/src/liflab/wsprofilinglab/data/**/*.json
