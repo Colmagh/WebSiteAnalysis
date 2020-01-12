@@ -32,7 +32,7 @@ public class MyLaboratory extends Laboratory
 	public void setup()
 	{
 		setTitle("Structural profiling of websites in the wild");
-		setAuthor("Xavier Chamberland-Thibeault");
+		setAuthor("Sylvain Hallé and Xavier Chamberland-Thibeault");
 
 		// Create tables		
 		ExperimentTable nbElementsVSnbClasses = new ExperimentTable("nbElementTotal","nbClasse");
