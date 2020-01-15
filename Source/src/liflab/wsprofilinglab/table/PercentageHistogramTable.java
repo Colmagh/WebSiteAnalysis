@@ -1,31 +1,32 @@
-package liflab.wsprofilinglab;
+package liflab.wsprofilinglab.table;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+
 import ca.uqac.lif.labpal.Experiment;
 import ca.uqac.lif.labpal.Laboratory;
 import ca.uqac.lif.mtnp.table.HardTable;
 import ca.uqac.lif.mtnp.table.TableEntry;
 import ca.uqac.lif.mtnp.table.TempTable;
 
-public class HistogramTable extends HardTable {
+public class PercentageHistogramTable extends HardTable {
 	
 	private Laboratory lab;
-	private String param;
-	private int[] gaps;
+	private String paramNumerator, paramDenominator;
+	private double[] gaps = {0.10,0.20,0.30,0.40,0.50,0.60,0.70,0.80,0.90,1};
 	
-	public HistogramTable (Laboratory lab, String param, int ...gaps)
+	public PercentageHistogramTable (Laboratory lab, String paramNumerator, String paramDenominator)
 	{
 		super();
 		this.lab = lab;
-		this.param = param;
-		this.gaps = gaps;
+		this.paramNumerator = paramNumerator;
+		this.paramDenominator = paramDenominator;
 	}
 	
 	public TempTable getDataTable(boolean b)
 	{
-		HardTable tmp = new HardTable(param, "nbSites");
+		HardTable tmp = new HardTable(paramNumerator, "nbSites");
 		HashMap<String, Integer> values = getExperimentsData();
 				
 		tmp.addAll(generateTableEntries(values));
@@ -40,7 +41,7 @@ public class HistogramTable extends HardTable {
 		for(int i = 0; i < gaps.length; i++)
 		{
 			TableEntry te = new TableEntry();
-			te.put(param, String.valueOf(gaps[i]));
+			te.put(paramNumerator, String.valueOf(gaps[i]*100));
 			te.put("nbSites", siteValues.get(String.valueOf(gaps[i])));
 			entries.add(te);
 		}
@@ -57,7 +58,13 @@ public class HistogramTable extends HardTable {
 		{
 			for(int i = 0; i < gaps.length; i++)
 			{
-				if(e.readInt(param) <= gaps[i])
+				double denom = (double)(e.readInt(paramDenominator));
+				if (denom == 0)
+				{
+					values.put(String.valueOf(gaps[i]), 0);
+					continue;
+				}
+				else if((e.readInt(paramNumerator)/denom) <= gaps[i])
 				{
 					int temp = values.get(String.valueOf(gaps[i])) != null? (int) values.get(String.valueOf(gaps[i])):0;
 					temp++;

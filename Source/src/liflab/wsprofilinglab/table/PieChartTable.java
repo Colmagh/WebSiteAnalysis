@@ -1,4 +1,4 @@
-package liflab.wsprofilinglab;
+package liflab.wsprofilinglab.table;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,7 +9,9 @@ import ca.uqac.lif.mtnp.table.HardTable;
 import ca.uqac.lif.mtnp.table.TableEntry;
 import ca.uqac.lif.mtnp.table.TempTable;
 
-public class PieChartTable extends HardTable {
+public class PieChartTable extends HardTable
+{
+	public static final transient String COL_NAME = "nbElement";
 	
 	private Laboratory lab;
 	private String columnName;
@@ -25,9 +27,10 @@ public class PieChartTable extends HardTable {
 		this.columnName = firstColumnName;
 	}
 	
+	@Override
 	public TempTable getDataTable(boolean b)
 	{
-		HardTable tmp = new HardTable("nbElement", columnName);
+		HardTable tmp = new HardTable(COL_NAME, columnName);
 		getExperimentsData();
 
 		tmp.addAll(generateTableEntries());
@@ -43,7 +46,7 @@ public class PieChartTable extends HardTable {
 		{
 			TableEntry te = new TableEntry();
 			te.put(columnName, String.valueOf(params[i]));
-			te.put("nbElement", nbElement.get(params[i]));
+			te.put(COL_NAME, nbElement.get(params[i]));
 			entries.add(te);
 		}
 		

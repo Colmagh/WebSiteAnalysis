@@ -121,7 +121,7 @@ public class WebSiteExperiment extends Experiment {
 		String filePath = readString("FilePath");
 		String siteName = filePath;//filePath.substring(filePath.lastIndexOf("\\") + 1, filePath.lastIndexOf("."));
 		write("siteName", siteName);
-		String contents = FileHelper.readToString(WebSiteExperiment.class.getResourceAsStream(MyLaboratory.SITES_FOLDER + "/" + filePath));
+		String contents = FileHelper.readToString(WebSiteExperiment.class.getResourceAsStream(ProfilingLab.SITES_FOLDER + "/" + filePath));
 		JSONParser parser = new JSONParser();
 
 		JSONObject data;
