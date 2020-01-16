@@ -29,6 +29,7 @@ public class ProfilingLab extends Laboratory
 	public static final transient String SITES_FOLDER = "data/sites";
 
 	private static final transient List<String> htmlTags = new ArrayList<String>();
+	private static final transient List<String> adsSite = new ArrayList<String>();
 
 	// Setup list of HTML tags
 	static
@@ -37,6 +38,13 @@ public class ProfilingLab extends Laboratory
 		while (s.hasNextLine())
 		{
 			htmlTags.add(s.nextLine());
+		}
+		s.close();
+		
+		s = new Scanner(ProfilingLab.class.getResourceAsStream("data/adsSite.txt"));
+		while (s.hasNextLine())
+		{
+			adsSite.add(s.nextLine());
 		}
 		s.close();
 	}
@@ -359,7 +367,7 @@ public class ProfilingLab extends Laboratory
 	 */
 	protected static boolean isAd(String file)
 	{
-		if (file.contains("(") && file.contains(")"))
+		if ((file.contains("(") && file.contains(")")) || adsSite.contains(file))
 		{
 			return true;
 		}
