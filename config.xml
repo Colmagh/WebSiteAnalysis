@@ -23,21 +23,21 @@
        script's default values -->
 
   <!-- The project's name -->
-  <name>My Laboratory</name>
+  <name>Structural profiling of web sites in the wild</name>
   
   <!-- The project's version number -->
   <version>1.0</version>
   
   <!-- The project's author. Currently this only
   shows up in the footer of the Javadoc documentation. -->
-  <author>Emmett Brown</author>
+  <author>Xavier Chamberland-Thibeault</author>
   
   <!-- The project's main class -->
-  <mainclass>mylab.MyLaboratory</mainclass>
+  <mainclass>mylab.ProfilingLab</mainclass>
   
   <!-- Output jar -->
   <jar>
-    <filename>my-lab.jar</filename>
+    <filename>web-profiling-lab.jar</filename>
     <withdeps>true</withdeps>
     <withdoc>false</withdoc>
   </jar>
@@ -61,7 +61,7 @@
       <classname>ca.uqac.lif.labpal.Laboratory</classname>
       <bundle>true</bundle>
       <files>
-        <zip>https://github.com/liflab/labpal/releases/download/v2.11.4/labpal-2.11.4.zip</zip>
+        <zip>https://github.com/liflab/labpal/releases/download/v2.11.5/labpal-2.11.5.zip</zip>
       </files>
     </dependency>
   </dependencies>
