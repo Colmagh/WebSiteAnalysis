@@ -46,7 +46,7 @@
   <srcdir>Source/src</srcdir>
   <bindir>Source/bin</bindir>
   <docdir>Source/doc</docdir>
-  <libdir>Source/lib</libdir>
+  <libdir>Source/lib</libdir>                                 
   <depdir>Source/dep</depdir>
   
   <!--
