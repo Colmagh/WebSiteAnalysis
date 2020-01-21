@@ -14,7 +14,9 @@ import ca.uqac.lif.mtnp.table.NormalizeColumns;
 import ca.uqac.lif.mtnp.table.Select;
 import ca.uqac.lif.mtnp.table.TransformedTable;
 import liflab.wsprofilinglab.macro.FractionInBetweenMacro;
+import liflab.wsprofilinglab.macro.FractionInvisibleMacroNegative;
 import liflab.wsprofilinglab.macro.LabStats;
+import liflab.wsprofilinglab.macro.PercentageInvisibleMacro;
 import liflab.wsprofilinglab.macro.QuartileMacro;
 import liflab.wsprofilinglab.table.CumulativeDistributionTable;
 import liflab.wsprofilinglab.table.HistogramTable;
@@ -37,14 +39,24 @@ public class ProfilingLab extends Laboratory
 		Scanner s = new Scanner(ProfilingLab.class.getResourceAsStream("data/html-tags.txt"));
 		while (s.hasNextLine())
 		{
-			htmlTags.add(s.nextLine());
+			String line = s.nextLine();
+			if (line.isEmpty() || line.startsWith("#"))
+			{
+				continue;
+			}
+			htmlTags.add(line);
 		}
 		s.close();
-		
+
 		s = new Scanner(ProfilingLab.class.getResourceAsStream("data/adsSite.txt"));
 		while (s.hasNextLine())
 		{
-			adsSite.add(s.nextLine());
+			String line = s.nextLine();
+			if (line.isEmpty() || line.startsWith("#"))
+			{
+				continue;
+			}
+			adsSite.add(line);
 		}
 		s.close();
 	}
@@ -54,7 +66,7 @@ public class ProfilingLab extends Laboratory
 	{
 		setTitle("Structural profiling of websites in the wild");
 		setAuthor("Xavier Chamberland-Thibeault and Sylvain Hallé");
-		
+
 		// Basic stats about the lab itself
 		add(new LabStats(this));
 
@@ -78,7 +90,7 @@ public class ProfilingLab extends Laboratory
 			add(exp);
 			nbElementsVSnbClasses.add(exp);
 			cpt++;
-			// if (cpt > 50) break; // Just for testing
+			//if (cpt > 50) break; // Just for testing
 		}
 
 		{
@@ -270,29 +282,42 @@ public class ProfilingLab extends Laboratory
 		distributionNoClassesRelative.setNickname("noClassRelative");
 		add(distributionNoClassesRelative);
 
-		PercentageHistogramTable percentInvisibleElements = new PercentageHistogramTable(this, "nbNoeudsInvisibles", "nbElementTotal");
-		percentInvisibleElements.setTitle("Distribution of websites relative to the percentage of invisible nodes");
-		percentInvisibleElements.setNickname("percentInvisible");
-		add(percentInvisibleElements);
+		{
+			// Visibility status
 
-		PieChartTable invisibleTypeUsage = new PieChartTable(this, "InvisibleType", new String[] {"visibility", "Display", "widthOrHeight", "negativePosition", "outsidePosition"});
-		invisibleTypeUsage.setTitle("Distribution of invisible type usage in websites");
-		invisibleTypeUsage.setNickname("invisibleType");
-		add(invisibleTypeUsage);
+			PieChartTable invisibleTypeUsage = new PieChartTable(this, "InvisibleType", new String[] {"visibility", "Display", "widthOrHeight", "negativePosition", "outsidePosition"});
+			invisibleTypeUsage.setTitle("Distribution of invisible type usage in websites");
+			invisibleTypeUsage.setNickname("invisibleType");
+			add(invisibleTypeUsage);
 
+			ca.uqac.lif.mtnp.plot.gral.PieChart invisibleTypeUsagePlot = new ca.uqac.lif.mtnp.plot.gral.PieChart(invisibleTypeUsage);
+			invisibleTypeUsagePlot.setTitle("Distribution of invisible type usage in websites");
+			invisibleTypeUsagePlot.setNickname("invisibleTypeUsage");
+			add(invisibleTypeUsagePlot);
+
+			FractionInvisibleMacroNegative fim = new FractionInvisibleMacroNegative(this, invisibleTypeUsage);
+			add(fim);
+		}
+
+		{
+			// Percentage of invisible nodes
+			PercentageHistogramTable percentInvisibleElements = new PercentageHistogramTable(this, "nbNoeudsInvisibles", "nbElementTotal");
+			percentInvisibleElements.setTitle("Distribution of websites relative to the percentage of invisible nodes");
+			percentInvisibleElements.setNickname("percentInvisible");
+			add(percentInvisibleElements);
+			
+			ClusteredHistogram histogramPercentInvisible = new ClusteredHistogram(percentInvisibleElements);
+			histogramPercentInvisible.setTitle("Distribution of websites relative to the percentage of invisible nodes");
+			histogramPercentInvisible.setNickname("percInvisiblePlot");
+			histogramPercentInvisible.setCaption(Axis.X, "Percentage of invisible nodes");
+			histogramPercentInvisible.setCaption(Axis.Y, "Number of sites");
+			add(histogramPercentInvisible);
+			
+			add(new PercentageInvisibleMacro(this));
+			
+		}
 
 		//Create plots	
-
-
-
-
-
-
-
-
-
-
-
 		Scatterplot classesVSsiteSize = new Scatterplot(nbElementsVSnbClasses);
 		classesVSsiteSize.setTitle("Distribution of the number of elements relative to the number of classes");
 		classesVSsiteSize.setNickname("classToNbElements");
@@ -346,20 +371,8 @@ public class ProfilingLab extends Laboratory
 		scatterNoClass.setCaption(Axis.Y, "% of sites");	
 		scatterNoClass.withPoints(false);
 		add(scatterNoClass);
-
-		ClusteredHistogram histogramPercentInvisible = new ClusteredHistogram(percentInvisibleElements);
-		histogramPercentInvisible.setTitle("Distribution of websites relative to the percentage of invisible nodes");
-		histogramPercentInvisible.setNickname("percInvisiblePlot");
-		histogramPercentInvisible.setCaption(Axis.X, "Percentage of invisible nodes");
-		histogramPercentInvisible.setCaption(Axis.Y, "Number of sites");
-		add(histogramPercentInvisible);
-
-		ca.uqac.lif.mtnp.plot.gral.PieChart invisibleTypeUsagePlot = new ca.uqac.lif.mtnp.plot.gral.PieChart(invisibleTypeUsage);
-		invisibleTypeUsagePlot.setTitle("Distribution of invisible type usage in websites");
-		invisibleTypeUsagePlot.setNickname("invisibleTypeUsage");
-		add(invisibleTypeUsagePlot);		
 	}
-	
+
 	/**
 	 * Determines if one of the files is an ad page
 	 * @param file The name of the file
