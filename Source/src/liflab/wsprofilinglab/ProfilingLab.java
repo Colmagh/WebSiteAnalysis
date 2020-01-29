@@ -192,6 +192,7 @@ public class ProfilingLab extends Laboratory
 			// Tag usage
 			PieChartTable elementTagUsage = new PieChartTable(this, "TagType", htmlTags.stream().toArray(String[]::new));
 			elementTagUsage.setShowInList(false);
+			elementTagUsage.setTopX(5);
 			TransformedTable tt = new TransformedTable(new NormalizeFirstColumn(), elementTagUsage);
 			tt.setTitle("Distribution of element tag type usage in websites");
 			tt.setNickname("percentElement");

@@ -2,7 +2,11 @@ package liflab.wsprofilinglab.table;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
 import ca.uqac.lif.labpal.Experiment;
 import ca.uqac.lif.labpal.Laboratory;
 import ca.uqac.lif.mtnp.table.HardTable;
@@ -17,6 +21,7 @@ public class PieChartTable extends HardTable
 	private String columnName;
 	private String[] params;
 	private HashMap<String, Integer> nbElement;
+	private int topX;
 	
 	public PieChartTable (Laboratory lab, String firstColumnName, String ... params)
 	{
@@ -25,6 +30,19 @@ public class PieChartTable extends HardTable
 		this.params = params;
 		generateHashMap();
 		this.columnName = firstColumnName;
+		this.topX = 0;
+	}
+	
+	public void setTopX(int x)
+	{
+		if(x > 0)
+		{
+			this.topX = x;
+		}
+		else
+		{
+			this.topX = 0;
+		}
 	}
 	
 	@Override
@@ -33,15 +51,56 @@ public class PieChartTable extends HardTable
 		HardTable tmp = new HardTable(COL_NAME, columnName);
 		getExperimentsData();
 
-		tmp.addAll(generateTableEntries());
+		if(topX == 0)
+			tmp.addAll(generateTableEntries());
+		else if(topX > 0)
+			tmp.addAll(generateXTableEntries());
 				
 		return tmp.getDataTable(b);
+	}
+	
+	private Collection<TableEntry> generateXTableEntries()
+	{
+		Collection<TableEntry> entries = new ArrayList<TableEntry>();
+		int others = 0;
+		
+		List<Entry<String, Integer>> entriesToSort = new ArrayList<Entry<String, Integer>>(nbElement.entrySet());
+			
+		Collections.sort(entriesToSort, new Comparator<Entry<String, Integer>>() {
+		   
+			@Override
+			public int compare(Entry<String, Integer> e1, Entry<String, Integer> e2) {
+				return e1.getValue().compareTo(e2.getValue());
+			}
+		});
+		
+		Collections.reverse(entriesToSort);
+		
+		for(int i = 0; i < topX; i++)
+		{
+			TableEntry te = new TableEntry();
+			te.put(columnName, entriesToSort.get(i).getKey());
+			te.put(COL_NAME, entriesToSort.get(i).getValue());
+			entries.add(te);
+		}
+		
+		for(int i = topX; i < entriesToSort.size(); i++)
+		{
+			others += entriesToSort.get(i).getValue();
+		}
+		
+		TableEntry te = new TableEntry();
+		te.put(columnName, "Others");
+		te.put(COL_NAME, others);
+		entries.add(te);
+		
+		return entries;
 	}
 	
 	private Collection<TableEntry> generateTableEntries()
 	{
 		Collection<TableEntry> entries = new ArrayList<TableEntry>();
-		
+
 		for(int i = 0; i < params.length; i++)
 		{
 			TableEntry te = new TableEntry();
@@ -61,8 +120,7 @@ public class PieChartTable extends HardTable
 		for(Experiment e : experiments)
 		{
 			for(int i = 0; i < size; i++)
-			{
-				
+			{				
 				if(e.hasParameter(params[i]))
 				{
 					nbElement.put(params[i], nbElement.get(params[i]) + e.getAllParameters().getInt(params[i]));
