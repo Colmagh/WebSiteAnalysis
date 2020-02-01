@@ -32,9 +32,27 @@ import ca.uqac.lif.mtnp.util.FileHelper;
 public class WebSiteExperiment extends Experiment 
 {
 	/**
-	 * Name for parameter "File path"
+	 * Name for parameter "Site"
 	 */
-	public static final transient String FILE_PATH = "File path";
+	public static final transient String SITE_NAME = "Site";
+	
+	/**
+	 *	Name for parameter containing the file extension
+	 */
+	public static final transient String FILE_EXTENSION = ".json";
+	
+	/**
+	 * Name for parameter containing the file name modifier
+	 */
+	public static final transient String FILE_NAME_MODIFIER = "_statistics";
+	
+	/**
+	 * Names for added parameters to the experiment
+	 */
+	public static final transient String NB_CLASS = "nbClass";
+	public static final transient String MIN_PER_CLASS = "minPerClass";
+	public static final transient String MAX_PER_CLASS = "maxPerClass";
+	public static final transient String AVG_PER_CLASS = "avgPerClass";
 
 	/**
 	 * List of experiment parameters that do <em>not</em> correspond to HTML
@@ -136,59 +154,71 @@ public class WebSiteExperiment extends Experiment
 	public WebSiteExperiment(String filePath)
 	{
 		this();
-		setInput(FILE_PATH, filePath);
+		String siteName = filePath.replace(FILE_NAME_MODIFIER, "");
+		siteName = siteName.replace(FILE_EXTENSION, "");
+		setInput(SITE_NAME, siteName);
 	}
 
 	WebSiteExperiment()
 	{
 		super();
-		describe(FILE_PATH, "The name of the internal file containing the harvested data for this site");
+		describe(SITE_NAME, "The name of the web site");
 	}
 
 	@Override
 	public void execute() throws ExperimentException, InterruptedException
 	{
-		String filePath = readString(FILE_PATH);
-		String siteName = filePath;//filePath.substring(filePath.lastIndexOf("\\") + 1, filePath.lastIndexOf("."));
-		write("siteName", siteName);
+		String filePath = getFilePath();
 		String contents = FileHelper.readToString(WebSiteExperiment.class.getResourceAsStream(ProfilingLab.SITES_FOLDER + "/" + filePath));
 		JSONParser parser = new JSONParser();
 
 		JSONObject data;
+		
 		try 
 		{
+			//Get the web site's data
 			data = (JSONObject) parser.parse(contents);
 		}
 		catch (ParseException e)
 		{
 			throw new ExperimentException(e);
 		}
+		
 		@SuppressWarnings("unchecked")
 		Iterator<String> keys = (Iterator<String>) data.keySet().iterator();
-		int maxParClasse = 0;
-		int minParClasse = Integer.MAX_VALUE;
-		int moyenneParClasse = 0;
-		int nbClasse = 0;
+		int maxPerClass = 0;
+		int minPerClass = Integer.MAX_VALUE;
+		int avgPerClass = 0;
+		int nbClass = 0;
 
+		/**
+		 * Go through the JSON to get every attribute and compile them into
+		 * desirable statistics
+		 */
 		while(keys.hasNext())
 		{
 			Object key = keys.next();
 			String keyName = key.toString();
 			int keyValue = Integer.parseInt(data.get(key).toString());
 
+			/**
+			 * If it has a lower case, isn't in the white list nor in the SVG list,
+			 * then it's a class name and must be compiled, otherwise it is added as
+			 * such to the experiment
+			 */
 			if(containsLowerCase(keyName) && !s_whiteList.contains(keyName) && !s_svgList.contains(keyName))
 			{
-				nbClasse++;
-				moyenneParClasse += keyValue;
+				nbClass++;
+				avgPerClass += keyValue;
 
-				if (minParClasse > keyValue)
+				if (minPerClass > keyValue)
 				{
-					minParClasse = keyValue;
+					minPerClass = keyValue;
 				}
 
-				if (maxParClasse < keyValue)
+				if (maxPerClass < keyValue)
 				{
-					maxParClasse = keyValue;
+					maxPerClass = keyValue;
 				}
 			}
 			else
@@ -197,12 +227,29 @@ public class WebSiteExperiment extends Experiment
 			}
 		}
 
-		write("nbClasse", nbClasse);
-		write("minParClasse", minParClasse);
-		write("maxParClasse", maxParClasse);			
-		write("moyenneParClasse", nbClasse > 0 ? moyenneParClasse / nbClasse : 0);
+		// Add the compiled data to the experiment
+		write(NB_CLASS, nbClass);
+		write(MIN_PER_CLASS, minPerClass);
+		write(MAX_PER_CLASS, maxPerClass);			
+		write(AVG_PER_CLASS, nbClass > 0 ? avgPerClass / nbClass : 0);
 	}
 
+	private String getFilePath()
+	{
+		//Get the name of the internal file containing the harvested data for this site
+		String filePath = readString(SITE_NAME);
+		if(filePath.contains("Copie"))
+		{
+			filePath = filePath.replace(" - Copie", FILE_NAME_MODIFIER + " - Copie" + FILE_EXTENSION);
+		}
+		else
+		{
+			filePath += FILE_NAME_MODIFIER + FILE_EXTENSION;
+		}
+		
+		return filePath;
+	}
+	
 	private boolean containsLowerCase(String str)
 	{
 		//convert String to char array

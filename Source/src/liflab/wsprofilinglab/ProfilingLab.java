@@ -41,14 +41,25 @@ import liflab.wsprofilinglab.table.PieChartTable;
 
 public class ProfilingLab extends Laboratory
 {
+	/**
+	 * Name of the parameter for the location of the sites' data
+	 */
 	public static final transient String SITES_FOLDER = "data/sites";
 
+	/**
+	 * Array that will list all HTML tags recovered in the html-tags.txt file
+	 */
 	private static final transient List<String> htmlTags = new ArrayList<String>();
+	
+	/**
+	 * Array that will list all the ads sites recovered
+	 */
 	private static final transient List<String> adsSite = new ArrayList<String>();
 
-	// Setup list of HTML tags
+	
 	static
 	{
+		// Setup list of HTML tags
 		Scanner s = new Scanner(ProfilingLab.class.getResourceAsStream("data/html-tags.txt"));
 		while (s.hasNextLine())
 		{
@@ -61,6 +72,7 @@ public class ProfilingLab extends Laboratory
 		}
 		s.close();
 
+		//Setup list of ads sites
 		s = new Scanner(ProfilingLab.class.getResourceAsStream("data/adsSite.txt"));
 		while (s.hasNextLine())
 		{
@@ -84,13 +96,13 @@ public class ProfilingLab extends Laboratory
 		add(new LabStats(this));
 
 		// Create tables		
-		ExperimentTable nbElementsVSnbClasses = new ExperimentTable("nbElementTotal","nbClasse");
+		ExperimentTable nbElementsVSnbClasses = new ExperimentTable("nbElementTotal",WebSiteExperiment.NB_CLASS);
 		nbElementsVSnbClasses.setTitle("Distribution of the number of elements relative to the number of classes");
 		nbElementsVSnbClasses.setNickname("elementsVsClasses");
 		add(nbElementsVSnbClasses);
 
 		// Add each web site as an experiment
-		List<String> filenames = FileHelper.getResourceListing(ProfilingLab.class, "liflab/wsprofilinglab/" + SITES_FOLDER, ".*\\.json");
+		List<String> filenames = FileHelper.getResourceListing(ProfilingLab.class, "liflab/wsprofilinglab/" + SITES_FOLDER, ".*\\"+WebSiteExperiment.FILE_EXTENSION);
 		for (String file : filenames)
 		{
 			if (isAd(file))
@@ -233,7 +245,7 @@ public class ProfilingLab extends Laboratory
 
 		{
 			// Number of classes
-			HistogramTable distributionNbClasses = new HistogramTable(this, "nbClasse", new int[] {0,1,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,350,450,750});
+			HistogramTable distributionNbClasses = new HistogramTable(this, WebSiteExperiment.NB_CLASS, new int[] {0,1,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,350,450,750});
 			distributionNbClasses.setTitle("Distribution of websites relative to the number of classes");
 			distributionNbClasses.setNickname("NbClasses");
 			add(distributionNbClasses);
@@ -263,35 +275,87 @@ public class ProfilingLab extends Laboratory
 
 		}
 
-		HistogramTable distributionMaxClasses = new HistogramTable(this, "maxParClasse", new int[] {0,1,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,350,450,550,650,750,850,950});
-		distributionMaxClasses.setTitle("Distribution of websites relative to the size of the biggest class");
-		distributionMaxClasses.setNickname("MaxPerClass");
-		add(distributionMaxClasses);
+		{//Classes sizes
+			//Max size
+			HistogramTable distributionMaxClasses = new HistogramTable(this, WebSiteExperiment.MAX_PER_CLASS, new int[] {0,1,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,350,450,550,650,750,850,950});
+			distributionMaxClasses.setTitle("Distribution of websites relative to the size of the biggest class");
+			distributionMaxClasses.setNickname("MaxPerClass");
+			add(distributionMaxClasses);
+	
+			CumulativeDistributionTable distributionMaxClassesRelative = new CumulativeDistributionTable(distributionMaxClasses, "Size of classes", "% of sites");
+			distributionMaxClassesRelative.setTitle("Distribution of websites relative to the size of the biggest class - Scatter plot version");
+			distributionMaxClassesRelative.setNickname("MaxPerClassRelative");
+			add(distributionMaxClassesRelative);
+			
+			ClusteredHistogram histogramMaxClasses = new ClusteredHistogram(distributionMaxClasses);
+			histogramMaxClasses.setTitle("Distribution of websites relative to the size of the biggest class");
+			histogramMaxClasses.setNickname("MaxClassesPlot");
+			histogramMaxClasses.setCaption(Axis.X, "Size of the biggest classes");
+			histogramMaxClasses.setCaption(Axis.Y, "Number of sites");
+			add(histogramMaxClasses);
 
-		CumulativeDistributionTable distributionMaxClassesRelative = new CumulativeDistributionTable(distributionMaxClasses, "Size of classes", "% of sites");
-		distributionMaxClassesRelative.setTitle("Distribution of websites relative to the size of the biggest class - Scatter plot version");
-		distributionMaxClassesRelative.setNickname("MaxPerClassRelative");
-		add(distributionMaxClassesRelative);
+			Scatterplot scatterMaxClasses = new Scatterplot(distributionMaxClassesRelative);
+			scatterMaxClasses.setTitle("Distribution of websites relative to the size of the biggest class");
+			scatterMaxClasses.setNickname("relativeMaxClassesPlot");
+			scatterMaxClasses.setCaption(Axis.X, "Size of classes");
+			scatterMaxClasses.setCaption(Axis.Y, "% of sites");	
+			scatterMaxClasses.withPoints(false);
+			add(scatterMaxClasses);
+	
+			//Average size
+			HistogramTable distributionAvgClasses = new HistogramTable(this, WebSiteExperiment.AVG_PER_CLASS, new int[] {0,1,2,4,6,8,10,12,14,16,18,20,22,24,26,28});
+			distributionAvgClasses.setTitle("Distribution of websites relative to the average size of the classes");
+			distributionAvgClasses.setNickname("avgClasses");
+			add(distributionAvgClasses);
+	
+			CumulativeDistributionTable distributionAvgClassesRelative = new CumulativeDistributionTable(distributionAvgClasses, "Average size of classes", "% of sites");
+			distributionAvgClassesRelative.setTitle("Distribution of websites relative to the average size of the classes - Scatter plot version");
+			distributionAvgClassesRelative.setNickname("avgClassesRelative");
+			add(distributionAvgClassesRelative);
+			
+			ClusteredHistogram histogramAvgClasses = new ClusteredHistogram(distributionAvgClasses);
+			histogramAvgClasses.setTitle("Distribution of websites relative to the average size of the classes");
+			histogramAvgClasses.setNickname("avgClassesPlot");
+			histogramAvgClasses.setCaption(Axis.X, "Average size of the classes");
+			histogramAvgClasses.setCaption(Axis.Y, "Number of sites");
+			add(histogramAvgClasses);
 
-		HistogramTable distributionAvgClasses = new HistogramTable(this, "moyenneParClasse", new int[] {0,1,2,4,6,8,10,12,14,16,18,20,22,24,26,28});
-		distributionAvgClasses.setTitle("Distribution of websites relative to the average size of the classes");
-		distributionAvgClasses.setNickname("avgClasses");
-		add(distributionAvgClasses);
+			Scatterplot scatterAvgClasses = new Scatterplot(distributionAvgClassesRelative);
+			scatterAvgClasses.setTitle("Distribution of websites relative to the average size of the classes");
+			scatterAvgClasses.setNickname("relativeAvgClassesPlot");
+			scatterAvgClasses.setCaption(Axis.X, "Average size of classes");
+			scatterAvgClasses.setCaption(Axis.Y, "% of sites");	
+			scatterAvgClasses.withPoints(false);
+			add(scatterAvgClasses);
+		}
+		
+		{
+			//Elements without a class
+			HistogramTable distributionNoClasses = new HistogramTable(this, "Pas de classe", new int[] {1,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,350,450,550,650,750,850,950,1050,1150,1250,2500,3750,5000});
+			distributionNoClasses.setTitle("Distribution of websites relative to the number of nodes wihtout a class");
+			distributionNoClasses.setNickname("noClass");
+			add(distributionNoClasses);
+	
+			CumulativeDistributionTable distributionNoClassesRelative = new CumulativeDistributionTable(distributionNoClasses, "Elements without class", "% of sites");
+			distributionNoClassesRelative.setTitle("Distribution of websites relative to the number of nodes wihtout a class - Scatter plot version");
+			distributionNoClassesRelative.setNickname("noClassRelative");
+			add(distributionNoClassesRelative);
+			
+			ClusteredHistogram histogramNoClass = new ClusteredHistogram(distributionNoClasses);
+			histogramNoClass.setTitle("Distribution of websites relative to the number of nodes without a class");
+			histogramNoClass.setNickname("noClassPlot");
+			histogramNoClass.setCaption(Axis.X, "Number of nodes without a class");
+			histogramNoClass.setCaption(Axis.Y, "Number of sites");
+			add(histogramNoClass);
 
-		CumulativeDistributionTable distributionAvgClassesRelative = new CumulativeDistributionTable(distributionAvgClasses, "Average size of classes", "% of sites");
-		distributionAvgClassesRelative.setTitle("Distribution of websites relative to the average size of the classes - Scatter plot version");
-		distributionAvgClassesRelative.setNickname("avgClassesRelative");
-		add(distributionAvgClassesRelative);
-
-		HistogramTable distributionNoClasses = new HistogramTable(this, "Pas de classe", new int[] {1,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,350,450,550,650,750,850,950,1050,1150,1250,2500,3750,5000});
-		distributionNoClasses.setTitle("Distribution of websites relative to the number of nodes wihtout a class");
-		distributionNoClasses.setNickname("noClass");
-		add(distributionNoClasses);
-
-		CumulativeDistributionTable distributionNoClassesRelative = new CumulativeDistributionTable(distributionNoClasses, "Elements without class", "% of sites");
-		distributionNoClassesRelative.setTitle("Distribution of websites relative to the number of nodes wihtout a class - Scatter plot version");
-		distributionNoClassesRelative.setNickname("noClassRelative");
-		add(distributionNoClassesRelative);
+			Scatterplot scatterNoClass = new Scatterplot(distributionNoClassesRelative);
+			scatterNoClass.setTitle("Distribution of websites relative to the number of nodes without a class");
+			scatterNoClass.setNickname("relativeNoClassPlot");
+			scatterNoClass.setCaption(Axis.X, "Elements without class");
+			scatterNoClass.setCaption(Axis.Y, "% of sites");	
+			scatterNoClass.withPoints(false);
+			add(scatterNoClass);
+		}
 
 		{
 			// Visibility status
@@ -326,9 +390,9 @@ public class ProfilingLab extends Laboratory
 			
 			add(new PercentageInvisibleMacro(this));
 			
-		}
-
-		//Create plots	
+		}	
+		
+		//Create plots 
 		Scatterplot classesVSsiteSize = new Scatterplot(nbElementsVSnbClasses);
 		classesVSsiteSize.setTitle("Distribution of the number of elements relative to the number of classes");
 		classesVSsiteSize.setNickname("classToNbElements");
@@ -337,51 +401,6 @@ public class ProfilingLab extends Laboratory
 		classesVSsiteSize.setCaption(Axis.Y, "Number of classes");
 		add(classesVSsiteSize);
 
-
-		ClusteredHistogram histogramMaxClasses = new ClusteredHistogram(distributionMaxClasses);
-		histogramMaxClasses.setTitle("Distribution of websites relative to the size of the biggest class");
-		histogramMaxClasses.setNickname("MaxClassesPlot");
-		histogramMaxClasses.setCaption(Axis.X, "Size of the biggest classes");
-		histogramMaxClasses.setCaption(Axis.Y, "Number of sites");
-		add(histogramMaxClasses);
-
-		Scatterplot scatterMaxClasses = new Scatterplot(distributionMaxClassesRelative);
-		scatterMaxClasses.setTitle("Distribution of websites relative to the size of the biggest class");
-		scatterMaxClasses.setNickname("relativeMaxClassesPlot");
-		scatterMaxClasses.setCaption(Axis.X, "Size of classes");
-		scatterMaxClasses.setCaption(Axis.Y, "% of sites");	
-		scatterMaxClasses.withPoints(false);
-		add(scatterMaxClasses);
-
-		ClusteredHistogram histogramAvgClasses = new ClusteredHistogram(distributionAvgClasses);
-		histogramAvgClasses.setTitle("Distribution of websites relative to the average size of the classes");
-		histogramAvgClasses.setNickname("avgClassesPlot");
-		histogramAvgClasses.setCaption(Axis.X, "Average size of the classes");
-		histogramAvgClasses.setCaption(Axis.Y, "Number of sites");
-		add(histogramAvgClasses);
-
-		Scatterplot scatterAvgClasses = new Scatterplot(distributionAvgClassesRelative);
-		scatterAvgClasses.setTitle("Distribution of websites relative to the average size of the classes");
-		scatterAvgClasses.setNickname("relativeAvgClassesPlot");
-		scatterAvgClasses.setCaption(Axis.X, "Average size of classes");
-		scatterAvgClasses.setCaption(Axis.Y, "% of sites");	
-		scatterAvgClasses.withPoints(false);
-		add(scatterAvgClasses);
-
-		ClusteredHistogram histogramNoClass = new ClusteredHistogram(distributionNoClasses);
-		histogramNoClass.setTitle("Distribution of websites relative to the number of nodes without a class");
-		histogramNoClass.setNickname("noClassPlot");
-		histogramNoClass.setCaption(Axis.X, "Number of nodes without a class");
-		histogramNoClass.setCaption(Axis.Y, "Number of sites");
-		add(histogramNoClass);
-
-		Scatterplot scatterNoClass = new Scatterplot(distributionNoClassesRelative);
-		scatterNoClass.setTitle("Distribution of websites relative to the number of nodes without a class");
-		scatterNoClass.setNickname("relativeNoClassPlot");
-		scatterNoClass.setCaption(Axis.X, "Elements without class");
-		scatterNoClass.setCaption(Axis.Y, "% of sites");	
-		scatterNoClass.withPoints(false);
-		add(scatterNoClass);
 	}
 
 	/**
