@@ -1,3 +1,20 @@
+/*
+  A lab for web site profiling
+  Copyright (C) 2019-2020 Xavier Chamberland-Thibeault and Sylvain Hallé
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package liflab.wsprofilinglab;
 
 import java.util.ArrayList;
@@ -9,9 +26,6 @@ import ca.uqac.lif.labpal.Laboratory;
 import ca.uqac.lif.labpal.table.ExperimentTable;
 import ca.uqac.lif.mtnp.plot.TwoDimensionalPlot.Axis;
 import ca.uqac.lif.mtnp.plot.gnuplot.*;
-import ca.uqac.lif.mtnp.table.Composition;
-import ca.uqac.lif.mtnp.table.NormalizeColumns;
-import ca.uqac.lif.mtnp.table.Select;
 import ca.uqac.lif.mtnp.table.TransformedTable;
 import liflab.wsprofilinglab.macro.FractionInBetweenMacro;
 import liflab.wsprofilinglab.macro.FractionInvisibleMacroNegative;
@@ -24,7 +38,6 @@ import liflab.wsprofilinglab.table.NormalizeFirstColumn;
 import liflab.wsprofilinglab.table.PercentUsageHistogramTable;
 import liflab.wsprofilinglab.table.PercentageHistogramTable;
 import liflab.wsprofilinglab.table.PieChartTable;
-import liflab.wsprofilinglab.table.SortOrderRows;
 
 public class ProfilingLab extends Laboratory
 {
@@ -78,7 +91,6 @@ public class ProfilingLab extends Laboratory
 
 		// Add each web site as an experiment
 		List<String> filenames = FileHelper.getResourceListing(ProfilingLab.class, "liflab/wsprofilinglab/" + SITES_FOLDER, ".*\\.json");
-		int cpt = 1;
 		for (String file : filenames)
 		{
 			if (isAd(file))
@@ -86,11 +98,9 @@ public class ProfilingLab extends Laboratory
 				// We exclude from the analysis filenames that correspond to advertisements
 				continue;
 			}
-			WebSiteExperiment exp = new WebSiteExperiment(file, cpt);
+			WebSiteExperiment exp = new WebSiteExperiment(file);
 			add(exp);
 			nbElementsVSnbClasses.add(exp);
-			cpt++;
-			//if (cpt > 50) break; // Just for testing
 		}
 
 		{

@@ -1,3 +1,20 @@
+/*
+  A lab for web site profiling
+  Copyright (C) 2019-2020 Xavier Chamberland-Thibeault and Sylvain Hallé
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package liflab.wsprofilinglab;
 
 import java.util.Arrays;
@@ -12,9 +29,18 @@ import ca.uqac.lif.labpal.Experiment;
 import ca.uqac.lif.labpal.ExperimentException;
 import ca.uqac.lif.mtnp.util.FileHelper;
 
-public class WebSiteExperiment extends Experiment {
+public class WebSiteExperiment extends Experiment 
+{
+	/**
+	 * Name for parameter "File path"
+	 */
+	public static final transient String FILE_PATH = "File path";
 
-	private static final List<String>WhiteList = Arrays.asList(
+	/**
+	 * List of experiment parameters that do <em>not</em> correspond to HTML
+	 * tag names
+	 */
+	private static final List<String> s_whiteList = Arrays.asList(
 			"visibility",
 			"display",
 			"widthOrHeight",
@@ -28,7 +54,11 @@ public class WebSiteExperiment extends Experiment {
 			"nbNoeudsInvisibles",
 			"Pas de classe");
 
-	private static final List<String> SVGList = Arrays.asList(
+	/**
+	 * List of tag names that can be found in the &lt;svg&gt; part of a
+	 * page
+	 */
+	private static final List<String> s_svgList = Arrays.asList(
 			"a",
 			"animate",
 			"animateMotion",
@@ -103,22 +133,22 @@ public class WebSiteExperiment extends Experiment {
 			"use",
 			"view");
 
-	public WebSiteExperiment(String filePath, int expID)
-	{
-		setInput("FilePath", filePath);
-		setInput("expID", expID);
-	}
 	public WebSiteExperiment(String filePath)
 	{
-		setInput("FilePath", filePath);
+		this();
+		setInput(FILE_PATH, filePath);
 	}
-	public WebSiteExperiment()
+
+	WebSiteExperiment()
 	{
+		super();
+		describe(FILE_PATH, "The name of the internal file containing the harvested data for this site");
 	}
 
 	@Override
-	public void execute() throws ExperimentException, InterruptedException {
-		String filePath = readString("FilePath");
+	public void execute() throws ExperimentException, InterruptedException
+	{
+		String filePath = readString(FILE_PATH);
 		String siteName = filePath;//filePath.substring(filePath.lastIndexOf("\\") + 1, filePath.lastIndexOf("."));
 		write("siteName", siteName);
 		String contents = FileHelper.readToString(WebSiteExperiment.class.getResourceAsStream(ProfilingLab.SITES_FOLDER + "/" + filePath));
@@ -146,7 +176,7 @@ public class WebSiteExperiment extends Experiment {
 			String keyName = key.toString();
 			int keyValue = Integer.parseInt(data.get(key).toString());
 
-			if(containsLowerCase(keyName) && !WhiteList.contains(keyName) && !SVGList.contains(keyName))
+			if(containsLowerCase(keyName) && !s_whiteList.contains(keyName) && !s_svgList.contains(keyName))
 			{
 				nbClasse++;
 				moyenneParClasse += keyValue;
@@ -170,7 +200,7 @@ public class WebSiteExperiment extends Experiment {
 		write("nbClasse", nbClasse);
 		write("minParClasse", minParClasse);
 		write("maxParClasse", maxParClasse);			
-		write("moyenneParClasse", nbClasse > 0 ?moyenneParClasse/nbClasse : 0);
+		write("moyenneParClasse", nbClasse > 0 ? moyenneParClasse / nbClasse : 0);
 	}
 
 	private boolean containsLowerCase(String str)
@@ -178,14 +208,14 @@ public class WebSiteExperiment extends Experiment {
 		//convert String to char array
 		char[] charArray = str.toCharArray();
 
-		for(int i=0; i < charArray.length; i++){
-
+		for(int i=0; i < charArray.length; i++)
+		{
 			//if any character is not in lower case, return false
 			if( Character.isLowerCase( charArray[i] ))
+			{
 				return true;
+			}
 		}
-
 		return false;
 	}
-
 }
