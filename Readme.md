@@ -1,12 +1,9 @@
-Title of your lab
+Web site analysis
 =================
 
-| Author:      | Fred Flintstone      |
-| Contact:     | fred@bedrock.com     |
-| Version:     | 1.0                  |
-| Date:        | 2000 B.C.            |
+| Author:      | Xavier Chamberland-Thibeault & Sylvain Hallé      |
 
-Write here a quick description of your set of experiments.
+
 
 Instructions on using this archive
 ----------------------------------
